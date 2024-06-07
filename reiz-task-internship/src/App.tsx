@@ -24,6 +24,7 @@ const App = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [sortOrder, setSortOrder] = useState<OrderType>("asc");
   const [filterArea, setFilterArea] = useState<boolean>(false);
+  const [filterRegion, setFilterRegion] = useState<boolean>(false);
 
   // SORTING
 
@@ -48,7 +49,7 @@ const App = () => {
 
   // FILTERING BY AREA
 
-  const smallerThenLithuania = () => {
+  const smallerThenLithuaniaByRegion = () => {
     const countryName = "LitHuania";
     const findLithuania = countries.find((country: Country) => country.name.toLowerCase() === countryName.toLowerCase());
     const filter = countries.filter((country) => {
@@ -61,13 +62,33 @@ const App = () => {
 
   const toggleAreaFilter = () => {
     setFilterArea(!filterArea);
+    showCountriesByFilter(filterArea, smallerThenLithuaniaByRegion());
+  };
 
-    if(!filterArea) {
-      return smallerThenLithuania();
+  // FILTERING BY REGION
+
+  const countriesInOceaniaRegion = () => {
+    const region = "OceAnIa";
+    const filterOceania = countries.filter((country) => country.region.toLowerCase() === region.toLowerCase());
+    setFilteredCountries(filterOceania);
+  };
+
+  const toggleOceaniaFilter = () => {
+    setFilterRegion(!filterRegion);
+    showCountriesByFilter(filterRegion, countriesInOceaniaRegion());
+  };
+
+  // SHOW ALL COUNTRIES BY APPLIED FILTER (area, region)
+
+  const showCountriesByFilter = (filterName: boolean, filteringFunction: void) => {
+    if(!filterName) {
+      return filteringFunction;
     } else {
       setFilteredCountries(countries);
     }
   };
+
+  // DATA FETCHING
 
   useEffect(() => {
     setLoading(true);
@@ -92,13 +113,15 @@ const App = () => {
   return (
     <div className={styles.container}>
       <h1>List of countries:</h1>
-      <div>
+      <div className={styles.buttonsContainer}>
       {/* Sorting button */}
       <button onClick={toggleOrderSort}>
         {sortOrder === 'asc' ? 'Z - A' : 'A - Z'}
       </button>
-      {/* Filtering button */}
+      {/* Filtering by area button */}
       <button onClick={toggleAreaFilter}>{filterArea === true ? "All Countries" : "Area < Lithuania"}</button>
+      {/* Filtering by region button  */}
+      <button onClick={toggleOceaniaFilter}>{filterRegion === true? "All Countries" : "Oceania Region"}</button>
       </div>
       <ol className={styles.listContainer}>
         {loading && <h4>Data is loading...</h4>}
