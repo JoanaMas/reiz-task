@@ -20,10 +20,12 @@ type OrderType = "asc" | "desc";
 const App = () => {
 
   const [countries, setCountries] = useState<Countries>([]);
+  const [filteredCountries, setFilteredCountries] = useState<Countries>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [sortOrder, setSortOrder] = useState<OrderType>("asc");
+  const [filterArea, setFilterArea] = useState<boolean>(false);
 
-  // Sorting
+  // SORTING
 
   const sortCountries = (sortOrder: OrderType) => {
     const sortedCountries = [...countries].sort((a, b) => {
@@ -34,7 +36,7 @@ const App = () => {
       }
     });
 
-    setCountries(sortedCountries);
+    setFilteredCountries(sortedCountries);
   };
 
   const toggleOrderSort = () => {
@@ -42,7 +44,30 @@ const App = () => {
     setSortOrder(newOrder);
     sortCountries(newOrder);
   };
-  
+
+
+  // FILTERING BY AREA
+
+  const smallerThenLithuania = () => {
+    const countryName = "LitHuania";
+    const findLithuania = countries.find((country: Country) => country.name.toLowerCase() === countryName.toLowerCase());
+    const filter = countries.filter((country) => {
+      if(findLithuania) {
+        return country.area < findLithuania.area;
+      }
+    });
+        setFilteredCountries(filter);
+  };
+
+  const toggleAreaFilter = () => {
+    setFilterArea(!filterArea);
+
+    if(!filterArea) {
+      return smallerThenLithuania();
+    } else {
+      setFilteredCountries(countries);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -52,6 +77,8 @@ const App = () => {
         try {
           const result = await axios.get<Countries>('https://restcountries.com/v2/all?fields=name,region,area');
           setCountries(result.data);
+          setFilteredCountries(result.data);
+
         } catch (error) {
           console.error('Something went wrong! Failed to fetch data');
         } finally {
@@ -65,12 +92,17 @@ const App = () => {
   return (
     <div className={styles.container}>
       <h1>List of countries:</h1>
+      <div>
+      {/* Sorting button */}
       <button onClick={toggleOrderSort}>
         {sortOrder === 'asc' ? 'Z - A' : 'A - Z'}
       </button>
+      {/* Filtering button */}
+      <button onClick={toggleAreaFilter}>{filterArea === true ? "All Countries" : "Area < Lithuania"}</button>
+      </div>
       <ol className={styles.listContainer}>
         {loading && <h4>Data is loading...</h4>}
-        {countries.map((country, index) =>
+        {filteredCountries.map((country, index) =>
           <div key={index} className={styles.card}>
             <li>{country.name}</li>
             <li>{country.region}</li>
