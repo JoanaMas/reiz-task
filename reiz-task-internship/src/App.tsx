@@ -3,7 +3,7 @@ import axios from 'axios';
 // Components
 import CountryCard from './components/CountryCard';
 // Style
-import styles from './app.module.scss';
+import styles from './styles/app.module.scss';
 
 
 // Single country interface
