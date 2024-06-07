@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './styles/app.module.scss';
+// Components
+import CountryCard from './components/CountryCard';
+// Style
+import styles from './app.module.scss';
 
 
 // Single country interface
@@ -15,20 +18,20 @@ interface Country {
 type Countries = Country[];
 
 // Order type
-type OrderType = "asc" | "desc";
+type SortingOrderType = "asc" | "desc";
 
 const App = () => {
 
   const [countries, setCountries] = useState<Countries>([]);
   const [filteredCountries, setFilteredCountries] = useState<Countries>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [sortOrder, setSortOrder] = useState<OrderType>("asc");
+  const [sortOrder, setSortOrder] = useState<SortingOrderType>("asc");
   const [filterArea, setFilterArea] = useState<boolean>(false);
   const [filterRegion, setFilterRegion] = useState<boolean>(false);
 
   // SORTING
 
-  const sortCountries = (sortOrder: OrderType) => {
+  const sortCountries = (sortOrder: SortingOrderType) => {
     const sortedCountries = [...countries].sort((a, b) => {
       if(sortOrder === 'asc') {
         return (a.name.localeCompare(b.name));
@@ -36,7 +39,6 @@ const App = () => {
         return (b.name.localeCompare(a.name));
       }
     });
-
     setFilteredCountries(sortedCountries);
   };
 
@@ -65,6 +67,7 @@ const App = () => {
     showCountriesByFilter(filterArea, smallerThenLithuaniaByRegion());
   };
 
+
   // FILTERING BY REGION
 
   const countriesInOceaniaRegion = () => {
@@ -78,7 +81,8 @@ const App = () => {
     showCountriesByFilter(filterRegion, countriesInOceaniaRegion());
   };
 
-  // SHOW ALL COUNTRIES BY APPLIED FILTER (area, region)
+
+  // HELPER FUNCTION - SHOW ALL COUNTRIES BY APPLIED FILTER (area, region)
 
   const showCountriesByFilter = (filterName: boolean, filteringFunction: void) => {
     if(!filterName) {
@@ -88,26 +92,27 @@ const App = () => {
     }
   };
 
+
   // DATA FETCHING
 
   useEffect(() => {
-    setLoading(true);
-
-      const fetchCountries = async () => {
-
-        try {
+    
+    const fetchCountries = async () => {
+      
+      try {
+          setLoading(true);
           const result = await axios.get<Countries>('https://restcountries.com/v2/all?fields=name,region,area');
           setCountries(result.data);
           setFilteredCountries(result.data);
+          setLoading(false);
 
         } catch (error) {
           console.error('Something went wrong! Failed to fetch data');
-        } finally {
-          setLoading(false);
         }
       };
 
       fetchCountries();
+
   }, []);
 
   return (
@@ -123,15 +128,18 @@ const App = () => {
       {/* Filtering by region button  */}
       <button onClick={toggleOceaniaFilter}>{filterRegion === true? "All Countries" : "Oceania Region"}</button>
       </div>
+        {loading ? <h4>Data is loading...</h4> :        
       <ol className={styles.listContainer}>
-        {loading && <h4>Data is loading...</h4>}
         {filteredCountries.map((country, index) =>
-          <div key={index} className={styles.card}>
-            <li>{country.name}</li>
-            <li>{country.region}</li>
-            <li>{country.area}</li>
-          </div>)}
+          <CountryCard
+          index={index}
+          name={country.name}
+          region={country.region}
+          area={country.area}
+          />
+          )}
       </ol>
+        }
     </div>
   );
 };
