@@ -1,0 +1,23 @@
+.container {
+    width: 100%;
+    height: fit-content;
+    padding: 2rem;
+
+    .listContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .card {
+        width: 100%;
+        height: fit-content;
+        background-color: lightgreen;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        border: 1px solid wihte;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+    }
+}
